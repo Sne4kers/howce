@@ -113,6 +113,7 @@ private:
             }
             return result;
         } else if (piece_to_move.piece_ == Piece::KING) {
+            // TODO add castling
             auto possible_moves = std::array<Point, 8>({
                 Point{static_cast<int16_t>(piece_to_move.coordinates_.x_ - 1), static_cast<int16_t>(piece_to_move.coordinates_.y_ + 0)},
                 Point{static_cast<int16_t>(piece_to_move.coordinates_.x_ - 1), static_cast<int16_t>(piece_to_move.coordinates_.y_ + 1)},
