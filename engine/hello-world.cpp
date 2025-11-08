@@ -35,7 +35,11 @@ int main() {
     std::cout << "Evaluation of current position: " << evaluator.eval(board) << std::endl;
 
     for (int i = 31; i >= 0; i--) {
-        std::cout << i << " " << board.get_piece_with_id(i).has_value() << " has moves: " << board.get_possible_moves_for_piece(i).size() << std::endl;
+        if (board.get_piece_with_id(i).has_value())
+            std::cout << i << " " << board.get_piece_with_id(i).value() << " has moves: " << board.get_possible_moves_for_piece(i).size() << std::endl;
+        else {
+            std::cout << i << " doesnt exist!" << std::endl;
+        }
     }
 
     Engine e = Engine();

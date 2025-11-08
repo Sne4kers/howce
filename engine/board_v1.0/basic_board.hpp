@@ -294,6 +294,7 @@ public:
 
         const auto& piece_to_move = all_pieceses_[idx];
         const Piece moving_piece_type = piece_to_move.piece_;
+        const Color moving_piece_color = piece_to_move.color_;
 
         if (piece_to_move.color_ != next_to_move()) {
             // if attempted to move incorrect piece --> return failure
@@ -315,9 +316,9 @@ public:
                 std::erase_if(all_pieceses_, [&next_location](const PlacedPiece& p) { return p.coordinates_ == next_location; });
 
                 size_t idx_to_move_after_removal = get_piece_idx_from_id(piece_id_to_move).value_or(-1);
-                all_pieceses_[idx].coordinates_ = next_location;
+                all_pieceses_[idx_to_move_after_removal].coordinates_ = next_location;
 
-                board_state_[piece_to_move.coordinates_.x_][piece_to_move.coordinates_.y_] = std::make_pair(moving_piece_type, piece_to_move.color_);
+                board_state_[next_location.x_][next_location.y_] = std::make_pair(moving_piece_type, moving_piece_color);
 
                 // calculate if check/mate
                 bool is_check = is_king_under_attack(opponent_piece_color);

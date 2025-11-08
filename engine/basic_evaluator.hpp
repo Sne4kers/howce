@@ -213,6 +213,8 @@ public:
             position_value += get_value_for_position_of_piece(piece);
             piece_value += get_value_for_piece_existence(piece);
             std::cout << piece.piece_ << " " << piece.coordinates_ << " " << piece.id_ << std::endl;
+            std::cout << get_value_for_piece_existence(piece) << " " << get_value_for_position_of_piece(piece) << std::endl;
+            std::cout <<"--------------" << std::endl;
         }
         int sum = piece_value + position_value;
         return sum;
