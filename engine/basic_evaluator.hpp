@@ -1,4 +1,5 @@
 #include "engine/board_v1.0/basic_board.hpp"
+#include <iostream>
 
 consteval std::array<std::array<int, 8>, 8> rotate_by_180_matrix(const std::array<std::array<int, 8>, 8>& matrix) {
     std::array<std::array<int, 8>, 8> to_return{}; 
@@ -157,7 +158,7 @@ private:
     }
 
 
-    inline static constexpr int get_value_for_piece(const chess::PlacedPiece& p) {
+    inline static constexpr int get_value_for_position_of_piece(const chess::PlacedPiece& p) {
         // value_matrix;
         const auto& x = p.coordinates_.x_;
         const auto& y = p.coordinates_.y_;
@@ -178,12 +179,42 @@ private:
             return 0;
         }
     }
+
+    inline static constexpr int get_value_for_piece_existence(const chess::PlacedPiece& p) {
+        // value_matrix;
+        const int mult = p.color_ == chess::Color::WHITE ? 1 : -1;
+        // P = 100
+        // N = 320
+        // B = 330
+        // R = 500
+        // Q = 900
+        // K = 20000
+        if (p.piece_ == chess::Piece::PAWN) {
+            return mult * 100;
+        } else if (p.piece_ == chess::Piece::BISHOP) {
+            return mult * 330;
+        } else if (p.piece_ == chess::Piece::ROOK) {
+            return mult * 500;
+        } else if (p.piece_ == chess::Piece::QUEEN) {
+            return mult * 900;
+        } else if (p.piece_ == chess::Piece::KNIGHT) {
+            return mult * 320;
+        } else if (p.piece_ == chess::Piece::KING) {
+            return mult * 20000;
+        } else {
+            return 0;
+        }
+    }
 public:
     static int eval(const chess::BasicBoard& board) {
-        int sum = 0;
+        int position_value = 0;
+        int piece_value = 0;
         for (const auto& piece : board.available_pieces()) {
-            sum += get_value_for_piece(piece);
+            position_value += get_value_for_position_of_piece(piece);
+            piece_value += get_value_for_piece_existence(piece);
+            std::cout << piece.piece_ << " " << piece.coordinates_ << " " << piece.id_ << std::endl;
         }
+        int sum = piece_value + position_value;
         return sum;
     }
 };  

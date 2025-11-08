@@ -292,8 +292,8 @@ public:
         }
         size_t idx = idx_piece_to_move.value();
 
-        auto& piece_to_move = all_pieceses_[idx];
-        Piece moving_piece_type = piece_to_move.piece_;
+        const auto& piece_to_move = all_pieceses_[idx];
+        const Piece moving_piece_type = piece_to_move.piece_;
 
         if (piece_to_move.color_ != next_to_move()) {
             // if attempted to move incorrect piece --> return failure
@@ -311,11 +311,12 @@ public:
                 board_state_[piece_to_move.coordinates_.x_][piece_to_move.coordinates_.y_] = std::make_pair(Piece::VOID, piece_to_move.color_);
 
                 // remove piece if there is one being captured
-                auto& [piece_being_captured, color] = board_state_[next_location.x_][next_location.y_];
-                std::remove_if(all_pieceses_.begin(), all_pieceses_.end(), [&next_location](const PlacedPiece& p) { return p.coordinates_ == next_location; });
+                // auto& [piece_being_captured, color] = board_state_[next_location.x_][next_location.y_];
+                std::erase_if(all_pieceses_, [&next_location](const PlacedPiece& p) { return p.coordinates_ == next_location; });
 
-                // place the moving piece back
-                piece_to_move.coordinates_ = next_location;
+                size_t idx_to_move_after_removal = get_piece_idx_from_id(piece_id_to_move).value_or(-1);
+                all_pieceses_[idx].coordinates_ = next_location;
+
                 board_state_[piece_to_move.coordinates_.x_][piece_to_move.coordinates_.y_] = std::make_pair(moving_piece_type, piece_to_move.color_);
 
                 // calculate if check/mate
