@@ -21,6 +21,15 @@ enum Color {
 struct Point {
     int16_t x_;
     int16_t y_;
+
+    bool operator==(const Point& other) const {
+        return x_ == other.x_ && y_ == other.y_;
+    }
+};
+
+struct Move {
+    chess::Point from_;
+    chess::Point to_;
 };
 
 using PieceId = int;
@@ -30,6 +39,11 @@ struct PlacedPiece {
     Color color_;
     Point coordinates_;
     PieceId id_;
+};
+
+struct MoveOutcome {
+    bool success;
+    bool is_check;
 };
 
 std::ostream &operator<<(std::ostream &os, const Piece& piece) { 
@@ -84,11 +98,6 @@ std::ostream& operator<<(std::ostream &os, const PlacedPiece& placed_piece) {
     os << placed_piece.color_ << space_str << placed_piece.piece_ << at_str << placed_piece.coordinates_ << with_id_str << placed_piece.id_;
     return os;
 }
-
-struct Move {
-    chess::Point from_;
-    chess::Point to_;
-};
 
 std::string get_pretty_printing_of_cell_with_piece(const Piece& piece, const Color& piece_color, int x, int y) {
     Color color_of_cell = ((x + y) % 2 == 1) ? Color::WHITE : Color::BLACK;

@@ -2,6 +2,7 @@
 #include <vector>
 #include <array>
 #include <tuple>
+#include <optional>
 #include <stdexcept>
 
 namespace chess {
@@ -193,7 +194,7 @@ public:
         board_state_[1][1] = std::make_pair(Piece::PAWN, Color::WHITE);
         board_state_[2][1] = std::make_pair(Piece::PAWN, Color::WHITE);
         board_state_[3][1] = std::make_pair(Piece::PAWN, Color::WHITE);
-        board_state_[4][1] = std::make_pair(Piece::PAWN, Color::WHITE);
+        board_state_[4][3] = std::make_pair(Piece::PAWN, Color::WHITE);
         board_state_[5][1] = std::make_pair(Piece::PAWN, Color::WHITE);
         board_state_[6][1] = std::make_pair(Piece::PAWN, Color::WHITE);
         board_state_[7][1] = std::make_pair(Piece::PAWN, Color::WHITE);
@@ -211,7 +212,7 @@ public:
         board_state_[1][6] = std::make_pair(Piece::PAWN, Color::BLACK);
         board_state_[2][6] = std::make_pair(Piece::PAWN, Color::BLACK);
         board_state_[3][6] = std::make_pair(Piece::PAWN, Color::BLACK);
-        board_state_[4][6] = std::make_pair(Piece::PAWN, Color::BLACK);
+        board_state_[4][4] = std::make_pair(Piece::PAWN, Color::BLACK);
         board_state_[5][6] = std::make_pair(Piece::PAWN, Color::BLACK);
         board_state_[6][6] = std::make_pair(Piece::PAWN, Color::BLACK);
         board_state_[7][6] = std::make_pair(Piece::PAWN, Color::BLACK);
@@ -239,44 +240,116 @@ public:
     std::vector<PlacedPiece> available_pieces() const override {
         return all_pieceses_;
     }
-
-    std::vector<Point> get_possible_moves_for_piece(const PieceId& piece_id_to_move) const override {
-        for (const auto& piece : all_pieceses_) {
-            if (piece.id_ == piece_id_to_move) [[ unlikely ]] {
-                return get_possible_moves(piece);
-            }
-        }
-        throw std::runtime_error("No such piece id available");
-        return {};
-    }
-
-    PlacedPiece get_piece_info_from_id(const PieceId& piece_id_to_move) const {
-        for (const auto& piece : all_pieceses_) {
-            if (piece.id_ == piece_id_to_move) [[ unlikely ]] {
-                return piece;
-            }
-        }
-        throw std::runtime_error("No such piece id available");
-        return {};
-    }
-
+    
     std::vector<Move> get_move_log() const {
         return moves_made_;
+    }
+
+    std::vector<Point> get_possible_moves_for_piece(const PieceId& piece_id_to_move) const override {
+        std::optional<size_t> piece_idx = get_piece_idx_from_id(piece_id_to_move);
+        if (piece_idx.has_value()) {
+            return get_possible_moves(all_pieceses_[piece_idx.value()]);
+        } else {
+            return {};
+        }
+    }
+
+    std::optional<size_t> get_piece_idx_from_id(const PieceId& piece_id_to_move) const {
+        for (size_t i = 0; i < all_pieceses_.size(); i++) {
+            const auto& piece = all_pieceses_[i];
+            if (piece.id_ == piece_id_to_move) {
+                return i;
+            }
+        }
+        return std::nullopt;
+    }
+
+    std::optional<PlacedPiece> get_piece_with_id(const PieceId& piece_id_to_move) const {
+        std::optional<size_t> piece_idx = get_piece_idx_from_id(piece_id_to_move);
+        if (piece_idx.has_value()) {
+            return all_pieceses_[piece_idx.value()];
+        } else {
+            return std::nullopt;
+        }
+    }
+
+    bool is_mated(Color king_color) const {
+        auto attacking_piece_color = king_color ^ true;
+        return false;
+    }
+
+    bool is_king_under_attack(Color king_color) const {
+        auto attacking_piece_color = king_color ^ true;
+        return false;
+    }
+
+    MoveOutcome make_move(const PieceId& piece_id_to_move, const Point& next_location) {
+        // find a piece and proceed only such piece exists
+        std::optional<size_t> idx_piece_to_move = get_piece_idx_from_id(piece_id_to_move);
+        if (!idx_piece_to_move.has_value()) {
+            return MoveOutcome{false, false};
+        }
+        size_t idx = idx_piece_to_move.value();
+
+        auto& piece_to_move = all_pieceses_[idx];
+        Piece moving_piece_type = piece_to_move.piece_;
+
+        if (piece_to_move.color_ != next_to_move()) {
+            // if attempted to move incorrect piece --> return failure
+            return MoveOutcome{false, false};
+        }
+        Color moved_piece_color = static_cast<Color>(piece_to_move.color_);
+        Color opponent_piece_color = static_cast<Color>(piece_to_move.color_ ^ true);
+        auto possible_move_locations = get_possible_moves_for_piece(piece_id_to_move);
+        for (const auto& target_point : possible_move_locations) {
+            if (target_point == next_location) {
+                // perform the move as the move is deemed possible
+                next_to_go_ = static_cast<Color>(next_to_go_ ^ true);
+
+                // remove moving piece from the board
+                board_state_[piece_to_move.coordinates_.x_][piece_to_move.coordinates_.y_] = std::make_pair(Piece::VOID, piece_to_move.color_);
+
+                // remove piece if there is one being captured
+                auto& [piece_being_captured, color] = board_state_[next_location.x_][next_location.y_];
+                std::remove_if(all_pieceses_.begin(), all_pieceses_.end(), [&next_location](const PlacedPiece& p) { return p.coordinates_ == next_location; });
+
+                // place the moving piece back
+                piece_to_move.coordinates_ = next_location;
+                board_state_[piece_to_move.coordinates_.x_][piece_to_move.coordinates_.y_] = std::make_pair(moving_piece_type, piece_to_move.color_);
+
+                // calculate if check/mate
+                bool is_check = is_king_under_attack(opponent_piece_color);
+                bool is_mate = is_mated(opponent_piece_color);
+                return MoveOutcome{true, is_check}; 
+            }
+        }
+        return MoveOutcome{false, false};
     }
 
     friend std::ostream &operator<<(std::ostream &os, const BasicBoard& m) { 
         const std::string new_line = "\n";
         const std::string space_literal = " ";
         const std::string reset_literal_line = "\x1b[0;m";
+
+        std::string col_value = " a ";
+        // os << space_literal << space_literal;
+        // for (int j = 0; j < 8; j++) {
+        //     os << col_value;
+        //     col_value[1]++;
+        // }
+        // os << new_line;
+
         for (int i = 7; i >= 0; i--) {
+            os << std::to_string(i + 1) << space_literal;
             for (int j = 0; j < 8; j++) {
                 os << get_pretty_printing_of_cell_with_piece(m.board_state_[j][i].first, m.board_state_[j][i].second, j, i);
             }
             os << reset_literal_line;
-            os << space_literal << std::to_string(i + 1);
+            // os << space_literal << std::to_string(i + 1);
             os << new_line;
         }
-        std::string col_value = " a ";
+        col_value = " a ";
+        os << space_literal << space_literal;
         for (int j = 0; j < 8; j++) {
             os << col_value;
             col_value[1]++;
