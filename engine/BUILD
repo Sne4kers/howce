@@ -1,6 +1,7 @@
 cc_binary(
     name = "basic_engine_runner",
-    srcs = ["hello-world.cpp", "engine.hpp", "basic_evaluator.hpp"],
+    # srcs = ["hello-world.cpp", "engine.hpp", "basic_evaluator.hpp"],
+    srcs = ["main.cpp", "interface.hpp", "engine.hpp", "basic_evaluator.hpp"],
     # hdrs = ["hello-greet.h"],
     visibility = ["//visibility:public"],
     deps = [

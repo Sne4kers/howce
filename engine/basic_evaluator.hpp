@@ -109,7 +109,7 @@ private:
     inline static constexpr auto white_queen_eval_matrix = rotate_by_180_matrix(queen_eval_matrix);
     inline static constexpr auto white_king_eval_matrix_midgame = rotate_by_180_matrix(king_eval_matrix_midgame);
 
-    inline static int get_pawn_matrix_value(chess::Color color, int x, int y) {
+    inline static constexpr int get_pawn_matrix_value(chess::Color color, int x, int y) {
         if (color == chess::Color::WHITE) {
             return white_pawn_eval_matrix[y][x];
         } else {
@@ -117,7 +117,7 @@ private:
         }
     }
 
-    inline static int get_bishop_matrix_value(chess::Color color, int x, int y) {
+    inline static constexpr int get_bishop_matrix_value(chess::Color color, int x, int y) {
         if (color == chess::Color::WHITE) {
             return white_bishop_eval_matrix[y][x];
         } else {
@@ -125,7 +125,7 @@ private:
         }
     }
 
-    inline static int get_knight_matrix_value(chess::Color color, int x, int y) {
+    inline static constexpr int get_knight_matrix_value(chess::Color color, int x, int y) {
         if (color == chess::Color::WHITE) {
             return white_knight_eval_matrix[y][x];
         } else {
@@ -133,7 +133,7 @@ private:
         }
     }
 
-    inline static int get_queen_matrix_value(chess::Color color, int x, int y) {
+    inline static constexpr int get_queen_matrix_value(chess::Color color, int x, int y) {
         if (color == chess::Color::WHITE) {
             return white_queen_eval_matrix[y][x];
         } else {
@@ -141,7 +141,7 @@ private:
         }
     }
 
-    inline static int get_king_matrix_value(chess::Color color, int x, int y) {
+    inline static constexpr int get_king_matrix_value(chess::Color color, int x, int y) {
         if (color == chess::Color::WHITE) {
             return white_king_eval_matrix_midgame[y][x];
         } else {
@@ -149,7 +149,7 @@ private:
         }
     }
 
-    inline static int get_rook_matrix_value(chess::Color color, int x, int y) {
+    inline static constexpr int get_rook_matrix_value(chess::Color color, int x, int y) {
         if (color == chess::Color::WHITE) {
             return white_rook_eval_matrix[y][x];
         } else {
@@ -212,9 +212,9 @@ public:
         for (const auto& piece : board.available_pieces()) {
             position_value += get_value_for_position_of_piece(piece);
             piece_value += get_value_for_piece_existence(piece);
-            std::cout << piece.piece_ << " " << piece.coordinates_ << " " << piece.id_ << std::endl;
-            std::cout << get_value_for_piece_existence(piece) << " " << get_value_for_position_of_piece(piece) << std::endl;
-            std::cout <<"--------------" << std::endl;
+            // std::cout << piece.piece_ << " " << piece.coordinates_ << " " << piece.id_ << std::endl;
+            // std::cout << get_value_for_piece_existence(piece) << " " << get_value_for_position_of_piece(piece) << std::endl;
+            // std::cout <<"--------------" << std::endl;
         }
         int sum = piece_value + position_value;
         return sum;

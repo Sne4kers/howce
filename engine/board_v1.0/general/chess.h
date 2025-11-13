@@ -95,7 +95,7 @@ std::ostream& operator<<(std::ostream &os, const PlacedPiece& placed_piece) {
     const std::string space_str = " ";
     const std::string at_str = "@";
     const std::string with_id_str = " with id ";
-    os << placed_piece.color_ << space_str << placed_piece.piece_ << at_str << placed_piece.coordinates_ << with_id_str << placed_piece.id_;
+    os << placed_piece.color_ << space_str << placed_piece.piece_ << at_str << placed_piece.coordinates_ << with_id_str << std::to_string(placed_piece.id_);
     return os;
 }
 

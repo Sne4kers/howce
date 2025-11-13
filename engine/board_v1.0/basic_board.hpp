@@ -129,6 +129,7 @@ private:
                     result.emplace_back(new_position);
                 }
             }
+            // TODO add castling
             return result;
         } else if (piece_to_move.piece_ == Piece::PAWN) {
             std::array<Point, 2> possible_captures;
