@@ -1,3 +1,5 @@
+#pragma once
+
 #include "general/chess.h"
 #include <vector>
 #include <array>

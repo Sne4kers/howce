@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -29,23 +31,34 @@ private:
         std::cout << board_;
     }
 
+    void eval() {
+        int score = engine_.get_eval_of_position(board_);
+        std::cout << "The current board was scored at " << score << '\n';
+    }
+
     void invalidate_input(const std::string& extra_info = "") {
         std::cout << "Bad input\n" << extra_info;
     }
 
-    void sugest_fixing_newgame_arguments() {
-        invalidate_input("newgame command doesn't have any additional arguments");
+    void sugest_fixing_no_extra_arguments(const std::string& command_name) {
+        invalidate_input(command_name + " command doesn't have any additional arguments");
     }
 
     void verify_command(const std::vector<std::string>& arguments) {
         if (arguments[0] == "newgame") {
             if (arguments.size() != 1) {
-                sugest_fixing_newgame_arguments();
+                sugest_fixing_no_extra_arguments("newgame");
             } else {
                 new_game();
             }
+        } else if (arguments[0] == "eval") {
+            if (arguments.size() != 1) {
+                sugest_fixing_no_extra_arguments("eval");
+            } else {
+                eval();
+            }
         } else {
-            invalidate_input();
+            invalidate_input("no such command found");
         }
     }
 

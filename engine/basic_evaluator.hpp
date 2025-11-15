@@ -1,3 +1,5 @@
+#pragma once
+
 #include "engine/board_v1.0/basic_board.hpp"
 #include <iostream>
 
